@@ -1,0 +1,18 @@
+{
+  "name": "carson",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:watch": "nodemon"
+  },
+  "dependencies": {
+    "body-parser": "1.17.1",
+    "express": "4.15.2",
+    "request": "2.81.0",
+    "request-promise": "4.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "1.11.0"
+  }
+}
