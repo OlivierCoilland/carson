@@ -36,7 +36,9 @@ function handle_issues_event(payload) {
 }
 
 function handle_issue_comment_event(payload) {
+    const action = payload.action;
 
+    console.log(util.format('[issue_comment] [%s] not supported', action));
 }
 
 app.listen(3000, function () {
