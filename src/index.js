@@ -4,20 +4,26 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const util = require('util');
-const github = require('./lib/github');
+const config = require('./config');
+const carson = require('./lib/carson');
 
 app.use(bodyParser.json());
 
 app.post('/', function (req, res) {
     const github_event = req.header('x-github-event');
     const payload = req.body;
+    const sender_id = payload.sender.id;
 
-    if (github_event == 'issues') {
-        handle_issues_event(payload);
-    } else if (github_event == 'issue_comment') {
-        handle_issue_comment_event(payload);
+    if (sender_id == config.id) {
+        console.log(util.format('[%s] ignored (sent by webhook)', github_event));
     } else {
-        console.log(util.format('[%s] not supported', github_event));
+        if (github_event == 'issues') {
+            handle_issues_event(payload);
+        } else if (github_event == 'issue_comment') {
+            handle_issue_comment_event(payload);
+        } else {
+            console.log(util.format('[%s] not supported', github_event));
+        }
     }
 
     res.sendStatus(200);
@@ -25,11 +31,9 @@ app.post('/', function (req, res) {
 
 function handle_issues_event(payload) {
     const action = payload.action;
-    const issue = payload.issue;
-    const comments_url = issue.comments_url;
 
     if (action == 'opened') {
-        github.add_new_issue_comment(comments_url);
+        carson.handle_new_issue(payload);
     } else {
         console.log(util.format('[issues] [%s] not supported', action));
     }
@@ -38,7 +42,11 @@ function handle_issues_event(payload) {
 function handle_issue_comment_event(payload) {
     const action = payload.action;
 
-    console.log(util.format('[issue_comment] [%s] not supported', action));
+    if (action == 'created') {
+        carson.handle_new_comment(payload);
+    } else {
+        console.log(util.format('[issue_comment] [%s] not supported', action));
+    }
 }
 
 app.listen(3000, function () {
