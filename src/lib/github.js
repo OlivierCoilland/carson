@@ -11,20 +11,22 @@ const github_client = rp.defaults({
     json: true
 });
 
-function add_welcome_comment_to_issue(comments_url) {
-    github_client({
+function add_comment_to_issue(comments_url, body) {
+    return github_client({
         method: 'POST',
         uri: comments_url,
         body: {
-            body: "Hi, I'm Carson, have fun!"
+            body: body
         }
-    })
-    .then(function (body) {
-        console.log("New issue comment added!");
-    })
-    .catch(function (err) {
-        console.error(err);
     });
 }
 
-module.exports.add_welcome_comment_to_issue = add_welcome_comment_to_issue;
+function delete_comment(comment_url) {
+    return github_client({
+        method: 'DELETE',
+        uri: comment_url
+    });
+}
+
+module.exports.add_comment_to_issue = add_comment_to_issue;
+module.exports.delete_comment = delete_comment;
