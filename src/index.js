@@ -9,7 +9,7 @@ const carson = require('./lib/carson');
 
 app.use(bodyParser.json());
 
-app.post('/', function (req, res) {
+app.post('/', (req, res) => {
     const github_event = req.header('x-github-event');
     const payload = req.body;
     const sender_id = payload.sender.id;
@@ -49,6 +49,6 @@ function handle_issue_comment_event(payload) {
     }
 }
 
-app.listen(3000, function () {
+app.listen(3000, () => {
     console.log('App listening on port 3000!');
 })
