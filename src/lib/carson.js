@@ -70,6 +70,7 @@ function handle_vote(payload, vote) {
             const matches = poll_body.match(/([^]*#closepoll)([^]*)/);
             const new_poll_body = matches[1] + ln + "@" + sender_login + ": " + vote + matches[2];
             github.edit_comment(poll.url, new_poll_body);
+            github.delete_comment(comment_url);
             console.log("Voting " + vote);
         } else {
             console.log("Nothing to vote for!");
