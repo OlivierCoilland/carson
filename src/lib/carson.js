@@ -58,20 +58,13 @@ function handle_ask_for_closing(payload) {
 function handle_vote(payload, vote) {
     const issue = payload.issue;
     const comments_url = issue.comments_url;
-    const comment_url = payload.comment.url;
 
     github.get_comments(comments_url)
     .then((comments) => {
         const poll = get_poll_comment(comments);
 
         if (poll) {
-            const poll_body = poll.body;
-            const sender_login = payload.sender.login;
-            const matches = poll_body.match(/([^]*#closepoll)([^]*)/);
-            const new_poll_body = matches[1] + ln + "@" + sender_login + ": " + vote + matches[2];
-            github.edit_comment(poll.url, new_poll_body);
-            github.delete_comment(comment_url);
-            console.log("Voting " + vote);
+            update_poll(payload, vote, poll);
         } else {
             console.log("Nothing to vote for!");
         }
@@ -83,6 +76,24 @@ function get_poll_comment(comments) {
         return comment.user.id == config.id
             && /#closepoll/.test(comment.body);
     });
+}
+
+function update_poll(payload, vote, poll) {
+    const comment_url = payload.comment.url;
+    const sender_login = payload.sender.login;
+    const poll_body = poll.body;
+
+    let matches = poll_body.match(/([^]*#closepoll)([^]*)/);
+    let new_poll_body = matches[1] + ln + "@" + sender_login + ": " + vote + matches[2];
+    let score = 0;
+    let re = /@.*([+-]1)/g
+    while ((matches = re.exec(new_poll_body)) !== null) {
+        score += 1*matches[1];
+    }
+
+    github.edit_comment(poll.url, new_poll_body);
+    github.delete_comment(comment_url);
+    console.log(sender_login + " voted " + vote);
 }
 
 module.exports.handle_new_issue = handle_new_issue;
