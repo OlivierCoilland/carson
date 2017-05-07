@@ -79,21 +79,34 @@ function get_poll_comment(comments) {
 }
 
 function update_poll(payload, vote, poll) {
-    const comment_url = payload.comment.url;
     const sender_login = payload.sender.login;
     const poll_body = poll.body;
 
-    let matches = poll_body.match(/([^]*#closepoll)([^]*)/);
-    let new_poll_body = matches[1] + ln + "@" + sender_login + ": " + vote + matches[2];
-    let score = 0;
-    let re = /@.*([+-]1)/g
-    while ((matches = re.exec(new_poll_body)) !== null) {
-        score += 1*matches[1];
-    }
+    const new_poll_body = compute_new_poll_body(poll_body, sender_login, vote);
+    const score = compute_poll_score(new_poll_body);
 
     github.edit_comment(poll.url, new_poll_body);
-    github.delete_comment(comment_url);
+    github.delete_comment(payload.comment.url);
     console.log(sender_login + " voted " + vote);
+}
+
+function compute_new_poll_body(poll_body, sender_login, vote) {
+    const sender_vote = '@' + sender_login + ': ' + vote;
+    if ((new RegExp('@' + sender_login + ':')).test(poll_body)) {
+        return poll_body.replace(new RegExp('@' + sender_login + ':.*'), sender_vote);
+    } else {
+        return poll_body.replace(/#closepoll/, '#closepoll' + ln + sender_vote);
+    }
+}
+
+function compute_poll_score(poll_body) {
+    const re = /@.*([+-]1)/g;
+    let score = 0;
+    let matches;
+    while ((matches = re.exec(poll_body)) !== null) {
+        score += 1*matches[1];
+    }
+    return score;
 }
 
 module.exports.handle_new_issue = handle_new_issue;
