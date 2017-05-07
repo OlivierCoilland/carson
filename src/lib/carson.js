@@ -57,14 +57,13 @@ function handle_ask_for_closing(payload) {
 
 function handle_vote(payload, vote) {
     const issue = payload.issue;
-    const comments_url = issue.comments_url;
 
-    github.get_comments(comments_url)
+    github.get_comments(issue.comments_url)
     .then((comments) => {
         const poll = get_poll_comment(comments);
 
         if (poll) {
-            update_poll(payload, vote, poll);
+            update_poll(issue, payload, vote, poll);
         } else {
             console.log("Nothing to vote for!");
         }
@@ -78,16 +77,21 @@ function get_poll_comment(comments) {
     });
 }
 
-function update_poll(payload, vote, poll) {
+function update_poll(issue, payload, vote, poll) {
     const sender_login = payload.sender.login;
     const poll_body = poll.body;
 
     const new_poll_body = compute_new_poll_body(poll_body, sender_login, vote);
-    const score = compute_poll_score(new_poll_body);
-
     github.edit_comment(poll.url, new_poll_body);
     github.delete_comment(payload.comment.url);
     console.log(sender_login + " voted " + vote);
+
+    const poll_score = compute_poll_score(new_poll_body);
+    if (poll_score >= config.score_to_close) {
+        const close_comment_body = "This issue has been closed by show of hands.";
+        github.add_comment_to_issue(issue.comments_url, close_comment_body);
+        github.close_issue(issue.url);
+    }
 }
 
 function compute_new_poll_body(poll_body, sender_login, vote) {

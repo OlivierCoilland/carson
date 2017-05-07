@@ -45,7 +45,18 @@ function delete_comment(comment_url) {
     });
 }
 
+function close_issue(issue_url) {
+    return github_client({
+        method: 'PATCH',
+        uri: issue_url,
+        body: {
+            state: 'closed'
+        }
+    });
+}
+
 module.exports.get_comments = get_comments;
 module.exports.add_comment_to_issue = add_comment_to_issue;
 module.exports.edit_comment = edit_comment;
 module.exports.delete_comment = delete_comment;
+module.exports.close_issue = close_issue;
