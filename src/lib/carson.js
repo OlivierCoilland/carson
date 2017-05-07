@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('util');
+const winston = require('winston');
 const config = require('../config');
 const github = require('./github');
 
@@ -10,12 +11,12 @@ function handle_new_issue(payload) {
     const issue = payload.issue;
     const comments_url = issue.comments_url;
 
-    github.add_comment_to_issue(comments_url, "Hi, I'm Carson, have fun!")
+    github.add_comment_to_issue(comments_url, 'Hi, I\'m Carson, have fun!')
     .then(() => {
-        console.log("Added welcome message");
+        winston.info('Added welcome message');
     })
     .catch((err) => {
-        console.error(err);
+        winston.error(err);
     });
 }
 
@@ -30,7 +31,7 @@ function handle_new_comment(payload) {
     } else if (/#-1/.test(comment_body)) {
         handle_vote(payload, '-1');
     } else {
-        console.log(util.format('[issue_comment] [%s] triggered but nothing to do :(', action));
+        winston.info('[issue_comment] [%s] triggered but nothing to do :(', action);
     }
 }
 
@@ -39,19 +40,19 @@ function handle_ask_for_closing(payload) {
     const comments_url = issue.comments_url;
     const sender_login = payload.sender.login;
     const text = util.format(
-        "@%s asked to close this issue." + ln
-        + "`#+1` if you agree" + ln
-        + "`#-1` if you don't" + ln
+        '@%s asked to close this issue.' + ln
+        + '`#+1` if you agree' + ln
+        + '`#-1` if you don\'t' + ln
         + ln
-        + "#closepoll"
+        + '#closepoll'
     , sender_login);
 
     github.add_comment_to_issue(comments_url, text)
     .then(() => {
-        console.log("Added ask for closing message");
+        winston.info('Added ask for closing message');
     })
     .catch((err) => {
-        console.error(err);
+        winston.error(err);
     });
 }
 
@@ -65,7 +66,7 @@ function handle_vote(payload, vote) {
         if (poll) {
             update_poll(issue, payload, vote, poll);
         } else {
-            console.log("Nothing to vote for!");
+            winston.info('Nothing to vote for!');
         }
     });
 }
@@ -84,13 +85,14 @@ function update_poll(issue, payload, vote, poll) {
     const new_poll_body = compute_new_poll_body(poll_body, sender_login, vote);
     github.edit_comment(poll.url, new_poll_body);
     github.delete_comment(payload.comment.url);
-    console.log(sender_login + " voted " + vote);
+    winston.info(sender_login + ' voted ' + vote);
 
     const poll_score = compute_poll_score(new_poll_body);
     if (poll_score >= config.score_to_close) {
-        const close_comment_body = "This issue has been closed by show of hands.";
+        const close_comment_body = 'This issue has been closed by show of hands.';
         github.add_comment_to_issue(issue.comments_url, close_comment_body);
         github.close_issue(issue.url);
+        winston.info('Issue closed by show of hands');
     }
 }
 

@@ -4,15 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:watch": "nodemon"
+    "start:watch": "nodemon",
+    "test": "npm run lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "dependencies": {
     "body-parser": "1.17.1",
     "express": "4.15.2",
     "request": "2.81.0",
-    "request-promise": "4.2.0"
+    "request-promise": "4.2.0",
+    "winston": "2.3.1"
   },
   "devDependencies": {
+    "eslint": "3.19.0",
     "nodemon": "1.11.0"
   }
 }
