@@ -6,7 +6,7 @@ const config = require('../config');
 const github_client = rp.defaults({
     headers: {
         'User-Agent': config.user_agent,
-        'Authorization': 'token ' + config.token
+        'Authorization': 'token ' + config.carson_token
     },
     json: true
 });

@@ -73,7 +73,7 @@ function handle_vote(payload, vote) {
 
 function get_poll_comment(comments) {
     return comments.find((comment) => {
-        return comment.user.id == config.id
+        return comment.user.id == config.carson_id
             && /#closepoll/.test(comment.body);
     });
 }

@@ -14,7 +14,7 @@ app.post('/', (req, res) => {
     const payload = req.body;
     const sender_id = payload.sender.id;
 
-    if (sender_id == config.id) {
+    if (sender_id == config.carson_id) {
         winston.info('[%s] ignored (sent by webhook)', github_event);
     } else {
         if (github_event == 'issues') {
