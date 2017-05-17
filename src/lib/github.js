@@ -5,7 +5,7 @@ const config = require('../config');
 
 const github_client = rp.defaults({
     headers: {
-        'User-Agent': config.repository,
+        'User-Agent': config.user_agent,
         'Authorization': 'token ' + config.token
     },
     json: true
