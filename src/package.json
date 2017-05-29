@@ -10,8 +10,8 @@
     "lint:fix": "eslint --fix ."
   },
   "dependencies": {
-    "body-parser": "1.17.1",
-    "express": "4.15.2",
+    "body-parser": "1.17.2",
+    "express": "4.15.3",
     "request": "2.81.0",
     "request-promise": "4.2.1",
     "winston": "2.3.1"
